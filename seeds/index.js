@@ -3,8 +3,9 @@ const path = require('path');
 const mongoose = require('mongoose');
 const Dish = require('../models/dish');
 const dishes = require('./dishes');
+const dbURL = process.env.DB_URL || 'mongodb://localhost:27017/dishFinder';
 
-mongoose.connect('mongodb://localhost:27017/dishFinder', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(dbURL, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log("Mongo Connection Open");
     })
