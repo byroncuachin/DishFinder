@@ -1,0 +1,28 @@
+<% layout('/layouts/boilerplate') %>
+<link rel="stylesheet" href="/stylesheets/ingredients.css">
+
+<h1>Dairy</h1>
+<a href="/addIngredients" class="lead">Back</a>
+
+<form action="/addIngredients/dairy" method="POST">
+    <div class="mt-3">
+        <!-- Creating checkboxes for fruits -->
+        <% dairyArr.forEach(function(dairy, i){ %>
+        <div class="mt-2 d-inline-flex">
+            <% if(inputDairyArr.indexOf(dairy) === -1){ %>
+            <input type="checkbox" class="form-control btn-check" id="btn-check-outlined<%= i %>" autocomplete="off"
+                name="ingredients" value="<%= dairy %>">
+            <%} else {%>
+            <input type="checkbox" class="form-control btn-check" id="btn-check-outlined<%= i %>" checked
+                autocomplete="off" name="ingredients" value="<%= dairy %>">
+            <% } %>
+            <label class="btn btn-outline-dark" for="btn-check-outlined<%= i %>"><%= dairy %></label>
+        </div>
+        <% }); %>
+    </div>
+
+    <div class="mt-5">
+        <button class="btn btn-dark btn-lg text-white">Submit</button>
+    </div>
+</form>
+</div>

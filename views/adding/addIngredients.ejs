@@ -1,0 +1,59 @@
+<% layout('/layouts/boilerplate') %>
+<link rel="stylesheet" href="/stylesheets/addIngredients.css">
+
+<h1>Add your Ingredients</h1>
+<div class="container">
+    <div class="row mt-4">
+        <div class="col-lg-4 d-flex justify-content-center mt-2">
+            <a href="/addIngredients/fruits" class="btn btn-outline-dark btn-lg ingredientBtn">
+                <div class="d-flex flex-column justify-content-center mt-4">
+                    <i class="fas fa-apple-alt"></i><br><span class="ingredients">Fruits & Vegetables</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-4 d-flex justify-content-center mt-2">
+            <a href="/addIngredients/meat" class="btn btn-outline-dark btn-lg ingredientBtn">
+                <div class="d-flex flex-column justify-content-center mt-4">
+                    <i class="fas fa-drumstick-bite"></i><br><span class="ingredients">Meat & Seafood</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-4 d-flex justify-content-center mt-2">
+            <a href="/addIngredients/condiments" class="btn btn-outline-dark btn-lg ingredientBtn">
+                <div class="d-flex flex-column justify-content-center mt-4">
+                    <i class="fas fa-hotdog"></i><br><span class="ingredients">Condiments</span>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-lg-4 d-flex justify-content-center mt-2">
+            <a href="/addIngredients/grains" class="btn btn-outline-dark btn-lg ingredientBtn">
+                <div class="d-flex flex-column justify-content-center mt-4">
+                    <i class="fas fa-bread-slice"></i><br><span class="ingredients">Baking & Grains</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-4 d-flex justify-content-center mt-2">
+            <a href="/addIngredients/dairy" class="btn btn-outline-dark btn-lg ingredientBtn">
+                <div class="d-flex flex-column justify-content-center mt-4">
+                    <i class="fas fa-cheese"></i><br><span class="ingredients">Dairy</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-4 d-flex justify-content-center mt-2">
+            <a href="/addIngredients/seasoning" class="btn btn-outline-dark btn-lg ingredientBtn">
+                <div class="d-flex flex-column justify-content-center mt-4">
+                    <i class="fas fa-pepper-hot"></i><br><span class="ingredients">Seasoning & Spices</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container d-flex justify-content-center mt-4">
+    <form action="/results">
+        <button class="btn btn-dark btn-lg text-white">Find Your Recipes!</button>
+    </form>
+</div>
+</div>

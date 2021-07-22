@@ -1,0 +1,28 @@
+<% layout('/layouts/boilerplate') %>
+<link rel="stylesheet" href="/stylesheets/ingredients.css">
+
+<h1>Seasoning & Spices</h1>
+<a href="/addIngredients" class="lead">Back</a>
+
+<form action="/addIngredients/seasoning" method="POST">
+    <div class="mt-3">
+        <!-- Creating checkboxes for meats -->
+        <% seasonings.forEach(function(seasoning, i){ %>
+        <div class="mt-2 d-inline-flex">
+            <% if(inputSeasoningArr.indexOf(seasoning) === -1){ %>
+            <input type="checkbox" class="form-control btn-check" id="btn-check-outlined<%= i %>" autocomplete="off"
+                name="ingredients" value="<%= seasoning %>">
+            <%} else {%>
+            <input type="checkbox" class="form-control btn-check" id="btn-check-outlined<%= i %>" checked
+                autocomplete="off" name="ingredients" value="<%= seasoning %>">
+            <% } %>
+            <label class="btn btn-outline-dark" for="btn-check-outlined<%= i %>"><%= seasoning %></label>
+        </div>
+        <% }); %>
+    </div>
+
+    <div class="mt-5">
+        <button class="btn btn-dark btn-lg text-white">Submit</button>
+    </div>
+</form>
+</div>
