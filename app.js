@@ -8,6 +8,8 @@ const ejsMate = require('ejs-mate');
 const path = require('path');
 const methodOverride = require('method-override');
 const Dish = require('./models/dish');
+const catchAsync = require('../utils/catchAsync');
+const ExpressError = require('./utils/expressError')
 const { meats, fruits, condiments, grainsArr, dairyArr, seasonings } = require('./seeds/ingredients');
 
 const app = express();
@@ -79,7 +81,7 @@ app.get('/addIngredients/seasoning', (req, res) => {
     res.render('adding/seasoning', { seasonings, inputSeasoningArr });
 })
 
-app.get('/results', async (req, res) => {
+app.get('/results', catchAsync(async (req, res) => {
     ingredientsArr = inputFruitsArr.concat(inputMeatsArr, inputCondimentsArr, inputGrainsArr, inputDairyArr, inputSeasoningArr);
     // const noDishes = await Dish.find({ ingredients: { $nin: ingredientsArr } });
     // const test = await Dish.find({ ingredients: { $exists: true }, $where: `this.ingredients.length <= ${ingredientsArr.length}` });
@@ -137,7 +139,7 @@ app.get('/results', async (req, res) => {
     inputDairyArr = [];
     inputSeasoningArr = [];
     res.render('../results', { dishes });
-})
+}));
 
 function saveIngredientToArr(req, res, arr) {
     arr = [];
@@ -174,6 +176,18 @@ app.post('/addIngredients/dairy', (req, res) => {
 app.post('/addIngredients/seasoning', (req, res) => {
     inputSeasoningArr = saveIngredientToArr(req, res, inputSeasoningArr);
     res.redirect('/addIngredients');
+})
+
+app.all('*', (req, res, next) => {
+    next(new ExpressError('Page Not Found', 404));
+})
+
+app.use((err, req, res, next) => {
+    const { statusCode = 500 } = err;
+    if (!err.message) {
+        err.message = 'Oh No, Something went Wrong!';
+    }
+    res.status(statusCode).render('error', { err });
 })
 
 const port = process.env.PORT || 3000
