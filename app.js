@@ -8,7 +8,7 @@ const ejsMate = require('ejs-mate');
 const path = require('path');
 const methodOverride = require('method-override');
 const Dish = require('./models/dish');
-const catchAsync = require('../utils/catchAsync');
+const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/expressError')
 const { meats, fruits, condiments, grainsArr, dairyArr, seasonings } = require('./seeds/ingredients');
 
