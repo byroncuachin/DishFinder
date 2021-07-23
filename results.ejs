@@ -9,7 +9,7 @@
     <% } else { %>
     <!-- If there are dishes that match ingredients -->
     <% for(let dish of dishes){ %>
-    <div class="container d-inline-flex" style="width: 20rem">
+    <div class="containe ms-0 d-inline-flex" style="width: 20rem">
         <div class="card mt-2 me-2" style="width: 18rem;">
             <img src="<%= dish.imageURL %>" class="card-thumbnail" alt="...">
             <div class="card-body">
@@ -25,4 +25,8 @@
     </div>
     <% } %>
     <% } %>
+
+    <div class="mt-4">
+        <a href="/" class="btn btn-dark btn-lg text-white">Home</a>
+    </div>
 </div>
