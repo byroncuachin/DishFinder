@@ -59,6 +59,13 @@ app.use(session(sessionConfig));
 const objArr = [{ meats }, { fruits }];
 
 app.get('/', (req, res) => {
+    req.session.inputFruitsArr = [];
+    req.session.inputMeatsArr = [];
+    req.session.inputCondimentsArr = [];
+    req.session.inputGrainsArr = [];
+    req.session.inputDairyArr = [];
+    req.session.inputSeasoningArr = [];
+
     res.render('home');
 })
 
