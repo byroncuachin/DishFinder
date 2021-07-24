@@ -11,7 +11,8 @@ const Dish = require('./models/dish');
 const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/expressError');
 const session = require('express-session');
-const { meats, fruits, condiments, grainsArr, dairyArr, seasonings } = require('./seeds/ingredients');
+
+const addIngredientsRoutes = require('./routes/addIngredients');
 
 const app = express();
 
@@ -56,8 +57,7 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 
-const objArr = [{ meats }, { fruits }];
-
+// home page
 app.get('/', (req, res) => {
     req.session.inputFruitsArr = [];
     req.session.inputMeatsArr = [];
@@ -69,49 +69,10 @@ app.get('/', (req, res) => {
     res.render('home');
 })
 
-app.get('/addIngredients', (req, res) => {
-    let inputFruitsArr = req.session.inputFruitsArr || [];
-    let ingredientsArr = inputFruitsArr.concat(req.session.inputMeatsArr, req.session.inputCondimentsArr, req.session.inputGrainsArr, req.session.inputDairyArr, req.session.inputSeasoningArr);
-    for (let i = ingredientsArr.length - 1; i > 0; i--) {
-        if (!ingredientsArr[i]) {
-            ingredientsArr.splice(i, 1);
-        }
-    }
+// routes for addingIngredients
+app.use('/addIngredients', addIngredientsRoutes);
 
-    req.session.ingredientsArr = ingredientsArr;
-    res.render('adding/addIngredients', { ingredientsArr });
-})
-
-app.get('/addIngredients/fruits', (req, res) => {
-    const inputFruitsArr = req.session.inputFruitsArr || [];
-    res.render('adding/fruits', { fruits, inputFruitsArr });
-})
-
-app.get('/addIngredients/meat', (req, res) => {
-    const inputMeatsArr = req.session.inputMeatsArr || [];
-    res.render('adding/meat', { meats, inputMeatsArr });
-})
-
-app.get('/addIngredients/condiments', (req, res) => {
-    const inputCondimentsArr = req.session.inputCondimentsArr || [];
-    res.render('adding/condiments', { condiments, inputCondimentsArr });
-})
-
-app.get('/addIngredients/grains', (req, res) => {
-    const inputGrainsArr = req.session.inputGrainsArr || [];
-    res.render('adding/grains', { grainsArr, inputGrainsArr });
-})
-
-app.get('/addIngredients/dairy', (req, res) => {
-    const inputDairyArr = req.session.inputDairyArr || [];
-    res.render('adding/dairy', { dairyArr, inputDairyArr });
-})
-
-app.get('/addIngredients/seasoning', (req, res) => {
-    const inputSeasoningArr = req.session.inputSeasoningArr || [];
-    res.render('adding/seasoning', { seasonings, inputSeasoningArr });
-})
-
+// results page
 app.get('/results', catchAsync(async (req, res) => {
     let dishes = await Dish.find({ ingredients: { $in: req.session.ingredientsArr } });
     let j = 0;
@@ -145,47 +106,10 @@ app.get('/results', catchAsync(async (req, res) => {
     res.render('../results', { dishes });
 }));
 
-function saveIngredientToArr(req, res, arr) {
-    arr = [];
-    if (typeof req.body.ingredients === 'string') {
-        arr.push((req.body.ingredients));
-    } else {
-        for (const ingredient in req.body.ingredients) {
-            arr.push(((req.body.ingredients)[ingredient]));
-        }
-    }
-    return arr;
-}
-
-app.post('/addIngredients/fruits', (req, res) => {
-    req.session.inputFruitsArr = saveIngredientToArr(req, res, req.session.inputFruitsArr);
-    res.redirect('/addIngredients');
-})
-app.post('/addIngredients/meat', (req, res) => {
-    req.session.inputMeatsArr = saveIngredientToArr(req, res, req.session.inputMeatsArr);
-    res.redirect('/addIngredients');
-})
-app.post('/addIngredients/condiments', (req, res) => {
-    req.session.inputCondimentsArr = saveIngredientToArr(req, res, req.session.inputCondimentsArr);
-    res.redirect('/addIngredients');
-})
-app.post('/addIngredients/grains', (req, res) => {
-    req.session.inputGrainsArr = saveIngredientToArr(req, res, req.session.inputGrainsArr);
-    res.redirect('/addIngredients');
-})
-app.post('/addIngredients/dairy', (req, res) => {
-    req.session.inputDairyArr = saveIngredientToArr(req, res, req.session.inputDairyArr);
-    res.redirect('/addIngredients');
-})
-app.post('/addIngredients/seasoning', (req, res) => {
-    req.session.inputSeasoningArr = saveIngredientToArr(req, res, req.session.inputSeasoningArr);
-    res.redirect('/addIngredients');
-})
-
+// error management
 app.all('*', (req, res, next) => {
     next(new ExpressError('Page Not Found', 404));
 })
-
 app.use((err, req, res, next) => {
     const { statusCode = 500 } = err;
     if (!err.message) {
