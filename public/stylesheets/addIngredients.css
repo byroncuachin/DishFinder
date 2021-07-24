@@ -16,3 +16,15 @@
 .submit{
     color: #22223b;
 }
+
+.list-group{
+    max-height: 28.9rem;
+}
+
+.list-group-item{
+    background-color: transparent;
+}
+
+.card{
+    background-color: transparent;
+}

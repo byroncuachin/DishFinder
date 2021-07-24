@@ -56,14 +56,6 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 
-let ingredientsArr = [];
-let inputFruitsArr = [];
-let inputMeatsArr = [];
-let inputCondimentsArr = [];
-let inputGrainsArr = [];
-let inputDairyArr = [];
-let inputSeasoningArr = [];
-
 const objArr = [{ meats }, { fruits }];
 
 app.get('/', (req, res) => {
@@ -73,6 +65,12 @@ app.get('/', (req, res) => {
 app.get('/addIngredients', (req, res) => {
     let inputFruitsArr = req.session.inputFruitsArr || [];
     let ingredientsArr = inputFruitsArr.concat(req.session.inputMeatsArr, req.session.inputCondimentsArr, req.session.inputGrainsArr, req.session.inputDairyArr, req.session.inputSeasoningArr);
+    for (let i = ingredientsArr.length - 1; i > 0; i--) {
+        if (!ingredientsArr[i]) {
+            ingredientsArr.splice(i, 1);
+        }
+    }
+
     req.session.ingredientsArr = ingredientsArr;
     res.render('adding/addIngredients', { ingredientsArr });
 })
