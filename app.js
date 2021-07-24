@@ -9,7 +9,8 @@ const path = require('path');
 const methodOverride = require('method-override');
 const Dish = require('./models/dish');
 const catchAsync = require('./utils/catchAsync');
-const ExpressError = require('./utils/expressError')
+const ExpressError = require('./utils/expressError');
+const session = require('express-session');
 const { meats, fruits, condiments, grainsArr, dairyArr, seasonings } = require('./seeds/ingredients');
 
 const app = express();
@@ -38,6 +39,23 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
+const secret = process.env.SECRET || 'itisanallrightsecret'
+
+const sessionConfig = {
+    name: 'session',
+    secret: secret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        // secure: true,
+        expires: Date.now() + (1000 * 60 * 60 * 24 * 7),
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+    }
+}
+
+app.use(session(sessionConfig));
+
 let ingredientsArr = [];
 let inputFruitsArr = [];
 let inputMeatsArr = [];
@@ -53,65 +71,54 @@ app.get('/', (req, res) => {
 })
 
 app.get('/addIngredients', (req, res) => {
-    ingredientsArr = inputFruitsArr.concat(inputMeatsArr, inputCondimentsArr, inputGrainsArr, inputDairyArr, inputSeasoningArr);
+    let inputFruitsArr = req.session.inputFruitsArr || [];
+    let ingredientsArr = inputFruitsArr.concat(req.session.inputMeatsArr, req.session.inputCondimentsArr, req.session.inputGrainsArr, req.session.inputDairyArr, req.session.inputSeasoningArr);
+    req.session.ingredientsArr = ingredientsArr;
     res.render('adding/addIngredients', { ingredientsArr });
 })
 
 app.get('/addIngredients/fruits', (req, res) => {
+    const inputFruitsArr = req.session.inputFruitsArr || [];
     res.render('adding/fruits', { fruits, inputFruitsArr });
 })
 
 app.get('/addIngredients/meat', (req, res) => {
+    const inputMeatsArr = req.session.inputMeatsArr || [];
     res.render('adding/meat', { meats, inputMeatsArr });
 })
 
 app.get('/addIngredients/condiments', (req, res) => {
+    const inputCondimentsArr = req.session.inputCondimentsArr || [];
     res.render('adding/condiments', { condiments, inputCondimentsArr });
 })
 
 app.get('/addIngredients/grains', (req, res) => {
+    const inputGrainsArr = req.session.inputGrainsArr || [];
     res.render('adding/grains', { grainsArr, inputGrainsArr });
 })
 
 app.get('/addIngredients/dairy', (req, res) => {
+    const inputDairyArr = req.session.inputDairyArr || [];
     res.render('adding/dairy', { dairyArr, inputDairyArr });
 })
 
 app.get('/addIngredients/seasoning', (req, res) => {
+    const inputSeasoningArr = req.session.inputSeasoningArr || [];
     res.render('adding/seasoning', { seasonings, inputSeasoningArr });
 })
 
 app.get('/results', catchAsync(async (req, res) => {
-    ingredientsArr = inputFruitsArr.concat(inputMeatsArr, inputCondimentsArr, inputGrainsArr, inputDairyArr, inputSeasoningArr);
-    // const noDishes = await Dish.find({ ingredients: { $nin: ingredientsArr } });
-    // const test = await Dish.find({ ingredients: { $exists: true }, $where: `this.ingredients.length <= ${ingredientsArr.length}` });
-    // const test = await Dish.find({ $and: [{ ingredients: { $exists: true }, $where: `this.ingredients.length <= ${ingredientsArr.length}` }, { ingredients: { $in: ingredientsArr } }] });
-    // finding dishes that include selected ingredients
-    let dishes = await Dish.find({ ingredients: { $in: ingredientsArr } });
+    let dishes = await Dish.find({ ingredients: { $in: req.session.ingredientsArr } });
     let j = 0;
     let k = 0;
     let flag = 0;
     let deleteIndexes = [];
-    // dishes.forEach((dish, i) => {
-    //     for (let ingredient of dish.ingredients) {
-    //         while (ingredient !== ingredientsArr[j]) {
-    //             if (j >= (ingredientsArr).length) {
-    //                 console.log('Deleted:', dishes[i].name);
-    //                 dishes.splice(i, 1);
-    //                 break;
-    //             }
-    //             console.log("NAME:", dish.name, 'INGREDIENTS: ', dish.ingredients, 'SELECTED: ', ingredientsArr);
-    //             console.log(ingredient, ingredientsArr[j]);
-    //             j++;
-    //         }
-    //         j = 0;
-    //     }
-    // });
+
     // finding indexes for objects that need to be excluded
     dishes.forEach((dish, i) => {
         while (dish.ingredients[j] && flag !== 1) {
-            while (dish.ingredients[j] !== ingredientsArr[k]) {
-                if (k >= (ingredientsArr).length) {
+            while (dish.ingredients[j] !== req.session.ingredientsArr[k]) {
+                if (k >= (req.session.ingredientsArr).length) {
                     deleteIndexes.push(i);
                     flag = 1;
                     break;
@@ -130,14 +137,6 @@ app.get('/results', catchAsync(async (req, res) => {
         dishes.splice(deleteIndexes[di], 1);
     }
 
-    // reseting arrays
-    ingredientsArr = [];
-    inputFruitsArr = [];
-    inputMeatsArr = [];
-    inputCondimentsArr = [];
-    inputGrainsArr = [];
-    inputDairyArr = [];
-    inputSeasoningArr = [];
     res.render('../results', { dishes });
 }));
 
@@ -154,27 +153,27 @@ function saveIngredientToArr(req, res, arr) {
 }
 
 app.post('/addIngredients/fruits', (req, res) => {
-    inputFruitsArr = saveIngredientToArr(req, res, inputFruitsArr);
+    req.session.inputFruitsArr = saveIngredientToArr(req, res, req.session.inputFruitsArr);
     res.redirect('/addIngredients');
 })
 app.post('/addIngredients/meat', (req, res) => {
-    inputMeatsArr = saveIngredientToArr(req, res, inputMeatsArr);
+    req.session.inputMeatsArr = saveIngredientToArr(req, res, req.session.inputMeatsArr);
     res.redirect('/addIngredients');
 })
 app.post('/addIngredients/condiments', (req, res) => {
-    inputCondimentsArr = saveIngredientToArr(req, res, inputCondimentsArr);
+    req.session.inputCondimentsArr = saveIngredientToArr(req, res, req.session.inputCondimentsArr);
     res.redirect('/addIngredients');
 })
 app.post('/addIngredients/grains', (req, res) => {
-    inputGrainsArr = saveIngredientToArr(req, res, inputGrainsArr);
+    req.session.inputGrainsArr = saveIngredientToArr(req, res, req.session.inputGrainsArr);
     res.redirect('/addIngredients');
 })
 app.post('/addIngredients/dairy', (req, res) => {
-    inputDairyArr = saveIngredientToArr(req, res, inputDairyArr);
+    req.session.inputDairyArr = saveIngredientToArr(req, res, req.session.inputDairyArr);
     res.redirect('/addIngredients');
 })
 app.post('/addIngredients/seasoning', (req, res) => {
-    inputSeasoningArr = saveIngredientToArr(req, res, inputSeasoningArr);
+    req.session.inputSeasoningArr = saveIngredientToArr(req, res, req.session.inputSeasoningArr);
     res.redirect('/addIngredients');
 })
 
